@@ -58,7 +58,7 @@ def op_imp(data_file):
         sys.exit(1)
     #return array with intensity data from MCA (.ws5), filename and modification 
     #date and time of the .ws5 file 
-    return np.array(ws5_raw_list), data_file, mod_date      
+    return np.array(ws5_raw_list), data_file, mod_date.strftime("%d.%m.%Y %H:%M:%S")      
 
 ##########################################################################################
 #fit data                                                                                #
@@ -394,15 +394,15 @@ v0, centerlist_v0 = calc_FP_v0(folded_spec)
 vmax, f = calc_vmax(folded_spec, ws5_raw_data)
 
 #print results, filename and modification date of the .ws5 file
-print('------------------------------------')
+print('-------------------------------------')
 print('Results for', filename, ':')
 print('File modified on', mod_date)
-print('------------------------------------')
+print('-------------------------------------')
 print('FP (channel) =', u'{:.4fP}'.format(FP))
 print('v₀ (channel) =', u'{:.4fP}'.format(v0))
 print('vmax /mm·s⁻¹ = ', u'{:.4fP}'.format(vmax))
 print('f /mm·s⁻¹/c  =  ', u'{:.4fP}'.format(f))
-print('------------------------------------')
+print('-------------------------------------')
 
 if args.show:
     #plot on request

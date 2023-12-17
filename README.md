@@ -33,7 +33,7 @@ vmax /mm·s⁻¹ =  -4.7010±0.0151
 f /mm·s⁻¹/c  =   0.0369±0.0001
 -------------------------------------
 ```
-You can use the first parameters for `fit-mb` to fit MB spectra [fit-mb](https://github.com/radi0sus/fit-mb). 
+You can use the first three parameters for `fit-mb` to fit MB spectra [fit-mb](https://github.com/radi0sus/fit-mb). 
 
 Start the script with:
 ```console

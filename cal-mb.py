@@ -74,7 +74,8 @@ def do_the_fit(data):
     #get prominences = peak separation from noise
     prominences = peak_prominences(-np.array(data), peaks)[0]
     #identify peaks from noise
-    peaks, _ = find_peaks(-data, prominence=(max(prominences)/3, max(prominences)))
+    #normal max(prominences)/3; found an example where only max(prominences)/4 worked
+    peaks, _ = find_peaks(-data, prominence=(max(prominences)/4, max(prominences)))
     #generate a list of Lorentz functions
     lorentzlist = list()
     #initialize parameters for lmfit
@@ -133,6 +134,9 @@ def fold_spec(data, FP):
     N_chan = len(data)
     #'(FP - 256.5)*2' for 512 channels, if channel 1 is 1 (and not zero)
     folding_diff = (FP.nominal_value - (int(N_chan/2)+0.5))*2
+    #found an example where folding_diff < 0; abs() correct?
+    if folding_diff < 0:
+        folding_diff = abs(folding_diff)
     #channels from 1 to max channel, step 1 channel 
     chan = np.linspace(1, N_chan, N_chan)
     #interpolate channels, to operate with channel floating point numbers (xxx.xx)
@@ -170,13 +174,13 @@ def calc_vmax(fit_result, data):
     #the well known quadrupole splitting values of 57Fe
     #
     #---------------------------------------------------
-    #   |       |       |       |       |       |
-    #   |       |       |<1.667>|       |       |
-    #   |       |                       |       |
-    #   |       |        <6.167>        |       |
-    #   |                                       |
-    #   |               <10.657>                |
-    #   |                 mm/s                  |
+    #   |       |       |         |       |       |
+    #   |       |       |<-1.667->|       |       |
+    #   |       |                         |       |
+    #   |       |<---------6.167--------->|       |
+    #   |                                         |
+    #   |<----------------10.657----------------->|
+    #   |                  mm/s                   |
     #
     #f is the velocity / channel
     if n_center == 6:
@@ -348,7 +352,9 @@ def plot(ws5_raw_data, folded_intens, unfolded_spec, folded_spec, FP, v0, vmax, 
     #arrange the plot window and show the plot
     mng = plt.get_current_fig_manager()
     mng.resize(1024,768)
-    N = 1.5
+    #(windows) low-res N = 1.2
+    #high-res N = 1.5
+    N = 1.2
     params = plt.gcf()
     plSize = params.get_size_inches()
     params.set_size_inches((plSize[0]*N*1, plSize[1]*N*1.5))

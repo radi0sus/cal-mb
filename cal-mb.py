@@ -349,12 +349,23 @@ def plot(ws5_raw_data, folded_intens, unfolded_spec, folded_spec, FP, v0, vmax, 
                 rotation = 0,
                 fontsize = 8)
                 
+    #secondary x-axis (secax) with velocity on top of ax1
+    def chan_2_vel(x_fold, vmax = vmax.nominal_value, v0 = v0.nominal_value, N_chan = len(ws5_raw_data)):
+        return vmax - (vmax + vmax)/(N_chan/2-1)*(x_fold+ (N_chan/2-1)/2 - v0)
+    
+    start, end = ax1.get_xlim()
+    secax = ax1.secondary_xaxis('top', functions=(chan_2_vel,chan_2_vel))
+    secax.set_ticks(np.arange(-end, end, 1))
+    secax.set_xlabel('velocity $\mathrm{/mm \cdot s^{-1}}$')
+    secax.tick_params(axis='x',direction='in')
+    #end secondary x-axis (secax) with velocity on top of ax1           
+    
     #arrange the plot window and show the plot
     mng = plt.get_current_fig_manager()
     mng.resize(1024,768)
     #(windows) low-res N = 1.2
     #high-res N = 1.5
-    N = 1.2
+    N = 1.5
     params = plt.gcf()
     plSize = params.get_size_inches()
     params.set_size_inches((plSize[0]*N*1, plSize[1]*N*1.5))

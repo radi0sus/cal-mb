@@ -42,7 +42,7 @@ python3 cal-mb.py 57Fe_calib_raw_data.ws5 -s
 calculates the same values as described above. In addition a `matplotlib` window is shown that 
 summarizes the fit results.
 
-<img src='examples\Figure_1.png' alt='Fit' width=600 align='center'> 
+<img src='examples\Figure_2.png' alt='Fit' width=600 align='center'> 
 
 The results will not be saved. To keep the output you have to start the script with:
 ```console

@@ -111,7 +111,7 @@ def do_the_fit(data):
 def calc_FP_v0(fit_result):
     #calc FP or v0 from the mean of the centers of the fitted Lorentz functions
     #a way to estimate the number of Lorentz functions (and centers) from the fit results
-    n_center = int((len(fit_result.params)-1)/5)
+    n_center = len([s for s in fit_result.var_names if 'center' in s])
     #generate a list of centers
     centerlist=list()
     for index in range(n_center):
@@ -161,7 +161,7 @@ def calc_vmax(fit_result, data):
     #from the manual of mcal from E.B.
     chan_mul = ((N_chan) / 2 - 1) / 2               #127.5 for 265
     #a way to estimate the number of Lorentz functions (and centers) from the fit results
-    n_center = int((len(fit_result.params)-1)/5)
+    n_center = len([s for s in fit_result.var_names if 'center' in s])
     #generate a list of centers
     centerlist=list()
     

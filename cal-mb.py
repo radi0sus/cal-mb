@@ -36,29 +36,19 @@ sys.stdout.reconfigure(encoding = 'utf-8') #unicode
 ########################################################################################## 
 def op_imp(data_file):
     try:
-        #read raw data into a list
-        ws5_raw_list = list()
-        with open(data_file, 'r') as input_file:
-            #get modification date and time of .ws5 file
-            mod_date = datetime.datetime.fromtimestamp(os.path.getmtime(data_file))
-            for line in input_file:
-                #if no '<' than its data
-                if not line.startswith('<'):
-                #if not '<' in line:
-                    try:
-                        #add intensities from .ws5 file to list
-                        ws5_raw_list.append(float(line.strip()))
-                    except ValueError:
-                        #wrong data -> exit here 
-                        print('Wrong data format. Exit')
-                        sys.exit(1)
+        #read raw data 
+        ws5_raw_data = np.loadtxt(data_file, comments=['#','<'])
+        mod_date = datetime.datetime.fromtimestamp(os.path.getmtime(data_file))
     except IOError:
         #file not found -> exit here
         print(f"'{data_file}'" + " not found. Exit.")
         sys.exit(1)
+    except ValueError:
+        print('Warning! Wrong data format. Exit.')
+        sys.exit(1)
     #return array with intensity data from MCA (.ws5), filename and modification 
     #date and time of the .ws5 file 
-    return np.array(ws5_raw_list), data_file, mod_date.strftime("%d.%m.%Y %H:%M:%S")      
+    return ws5_raw_data, data_file, mod_date.strftime("%d.%m.%Y %H:%M:%S")      
 
 ##########################################################################################
 #fit data                                                                                #

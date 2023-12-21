@@ -19,7 +19,8 @@ calculates the folding point `FP`, `v0` (channel where the velocity is zero),
 `vmax` (maximum velocity), and the velocity / channel `f`.
 
 The file should contain intensities from a multi-channel analyzer. The popular WissEl format
-has the extension `.ws5`. In principle any raw data (not only WissEl) can be processed.
+has the extension `.ws5`. In principle any raw data (not only WissEl) can be processed. Pay 
+attention to the start channel number and the folding direction.
 
 Terminal output:
 ```

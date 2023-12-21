@@ -49,3 +49,15 @@ The results will not be saved. To keep the output you have to start the script w
 python3 cal-mb.py 57Fe_calib_raw_data.ws5 > calib_from_today.txt
 ```
 To keep the figure, you have to click the floppy symbol (similar to 💾) in the `matplotlib` window.
+
+## Remarks
+
+- The script is benchmarked against the `mcal` program from Dr. Eckhard Bill.
+  Within the given restrictions, the results match quite well.
+- Raw spectra (WissEl .ws5 for example) are expected to start at channel 1 and be folded to the right.
+- `FP` is the mean of the centers of the individual Lorentz functions (4, 8 or 12) of the raw spectrum.
+- `v0` is the mean of the centers of the individual Lorentz functions (2, 4 or 6) of the folded spectrum.
+- `f` is the mean of `f` calculated with $\Delta E_Q$ from ⁵⁷Fe divided by the difference of the
+   single Lorentz functions form the outermost to the innermost pair (see also comment in the script).
+- `vmax` is  `f * 127.5` in case of 256 channels. 
+- The script has not been tested with raw data from 1024 channel multi-channel analyzers.

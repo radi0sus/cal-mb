@@ -135,6 +135,12 @@ def fold_spec(data, FP):
     lhs_chan = np.linspace(int(N_chan/2), 1, int(N_chan/2))
     #rhs (right hand side) channels 
     rhs_chan = np.linspace(int(N_chan/2) + 1, N_chan, int(N_chan/2))
+    #folding to the left
+    if args.foldleft:
+        #lhs (left hand side) channels; note that it goes from low to high
+        lhs_chan = np.linspace(1, int(N_chan/2), int(N_chan/2))
+        #rhs (right hand side) channels; note that it goes from high to low
+        rhs_chan = np.linspace(N_chan, int(N_chan/2) + 1, int(N_chan/2))
     #add the intensities of lhs + folding difference and rhs channels pairwise
     folded_intens = (np.add(data_ichan(lhs_chan+folding_diff), data_ichan(rhs_chan)))
     #return intensities of the folded spectrum
@@ -376,6 +382,11 @@ parser.add_argument('filename', help = 'file with raw data from 57Fe foil (ws5)'
 parser.add_argument('-s','--show',
     default=0, action='store_true',
     help='show the plot window')
+
+#folding to the left
+parser.add_argument('-fl','--foldleft',
+    default=0, action='store_true',
+    help='fold raw spectrum to the left')
     
 #parse arguments
 args = parser.parse_args()

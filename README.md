@@ -24,15 +24,24 @@ attention to the start channel number and the folding direction.
 
 Terminal output:
 ```
--------------------------------------
-Results for 57Fe_calib_raw_data.ws5 :
-File modified on 17.12.2023 19:53:55
--------------------------------------
-FP (channel) = 256.8019±0.0754
-v₀ (channel) = 125.7526±0.0858
-vmax /mm·s⁻¹ =  -4.7010±0.0151
-f /mm·s⁻¹/c  =   0.0369±0.0001
--------------------------------------
+======================================
+Results for 57Fe_calib_raw_data.ws5 :     ⇦ name of the file that contains ⁵⁷Fe-MB-spectrum 
+File modified on 24.08.2023 13:33:53      ⇦ modification date
+--------------------------------------
+FP (channel) = 256.7889±0.0588            ⇦ folding point
+v₀ (channel) = 125.6873±0.0620            ⇦ channel where velocity is zero
+vmax /mm·s⁻¹ =  -4.6926±0.0111            ⇦ maximum velocity
+f /mm·s⁻¹/c  =   0.0368±0.0001            ⇦ velocity / channel 
+======================================
+Statistics (folded data with weights):
+--------------------------------------
+data points :  256                        ⇦ number of data points
+variables   :  13                         ⇦ number of variables
+mean σ data :  152.68                     ⇦ weights for χ² and red. χ²
+χ²          :  537.49                     ⇦ Chi square(d) 
+red. χ²     :  2.21                       ⇦ reduced Chi square(d)
+R²          :  0.9736                     ⇦ R square(d)
+======================================
 ```
 You can use the first three parameters to fit MB spectra with [fit-mb](https://github.com/radi0sus/fit-mb). 
 

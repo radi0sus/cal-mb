@@ -452,6 +452,7 @@ print('Statistics (folded data with weights):')
 print('--------------------------------------')
 print('data points : ', '{}'.format(folded_spec.ndata))
 print('variables   : ', '{}'.format(folded_spec.nvarys))
+print('mean σ data : ', '{:.2f}'.format(mean_stdev_fold_i))
 print('χ²          : ', '{:.2f}'.format(folded_spec.chisqr))
 print('red. χ²     : ', '{:.2f}'.format(folded_spec.redchi))
  #R² is wrongly calculated from lmfit in case of weights <> 1

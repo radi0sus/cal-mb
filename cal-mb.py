@@ -10,6 +10,8 @@
 # python3 cal-mb.py 57Fe_calib_raw_data.ws5 -s
 #
 # '-s' to show the plot window 
+#
+# '-fl' to fold the raw spectrum to the left
 
 
 ##########################################################################################
@@ -53,7 +55,7 @@ def op_imp(data_file):
 ##########################################################################################
 #fit data                                                                                #
 ########################################################################################## 
-def do_the_fit(data):
+def do_the_fit(data, mean_stdev_fold_i = 1):
     #fit data with N Lorentz functions; N = number of detected peaks in raw data
     #get the number of channels
     N_chan = len(data)
@@ -90,8 +92,10 @@ def do_the_fit(data):
     
     #complete model for lmfit: list of Lorentz functions + offset
     curve = np.sum(lorentzlist) + bg
-    #do the fit
-    fit_result = curve.fit(data, params + bg_params, x = chan)
+    #do the fit with weights in case of the folded spectrum
+    #weights = 1 in case of the unfolded spectrum
+    fit_result = curve.fit(data, params + bg_params, x = chan, \
+       weights = 1/mean_stdev_fold_i, scale_covar=True)
     #return fit results
     return fit_result
     
@@ -143,8 +147,22 @@ def fold_spec(data, FP):
         rhs_chan = np.linspace(N_chan, int(N_chan/2) + 1, int(N_chan/2))
     #add the intensities of lhs + folding difference and rhs channels pairwise
     folded_intens = (np.add(data_ichan(lhs_chan+folding_diff), data_ichan(rhs_chan)))
-    #return intensities of the folded spectrum
-    return folded_intens
+    
+    #error from folding
+    #assuming that lhs intensity should be equal to rhs intensity
+    #since the sum of lhs intensity and rhs intensity is utilized, lhs and rhs intensity
+    #are doubled (*2)
+    lhs_i_2x = data_ichan(lhs_chan + folding_diff) * 2
+    rhs_i_2x = data_ichan(rhs_chan) * 2
+    #stddev for error bar plot in ax0
+    stdev_fold_i = np.std([lhs_i_2x, rhs_i_2x], axis = 0)
+    #mean stddev (one value) from sqrt of the mean of variances of 
+    #lhs and rhs intensity * 2
+    #the mean stddev is used as weight in the fit and for the residuals
+    mean_stdev_fold_i = np.sqrt(np.mean(np.var([lhs_i_2x, rhs_i_2x], axis = 0)))
+    
+    #return intensities of the folded spectrum ant the mean stddev 
+    return folded_intens, mean_stdev_fold_i
 
 ##########################################################################################
 #calc vmax                                                                               #
@@ -212,7 +230,7 @@ def calc_vmax(fit_result, data):
 #plot results                                                                            #
 ##########################################################################################
 def plot(ws5_raw_data, folded_intens, unfolded_spec, folded_spec, FP, v0, vmax, f, 
-        filename, centerlist_FP, centerlist_v0, mod_date):
+        filename, centerlist_FP, centerlist_v0, mod_date, mean_stdev_fold_i = 1):
     #plot the results
     #two subplots (unfolded & folded)
     fig, (ax0, ax1) = plt.subplots(2, 1)
@@ -270,7 +288,10 @@ def plot(ws5_raw_data, folded_intens, unfolded_spec, folded_spec, FP, v0, vmax, 
     ax0.set_xticks(np.linspace(1,len(ws5_raw_data),8))
     ax0.set_xlim([1, len(ws5_raw_data)])
     ax0.legend(fancybox = True, shadow = True, loc='upper right', prop={'size': 6})
-
+    
+    #R² is wrongly calculated from lmfit in case of weights <> 1
+    r_squared = 1 - (folded_spec.residual * mean_stdev_fold_i).var() / \
+                np.var(folded_spec.data)
     #all channel x values 1...256 for example for the lower plot
     x_fold = np.linspace(1,len(folded_intens),len(folded_intens))
     #title of sub plot 1
@@ -280,17 +301,21 @@ def plot(ws5_raw_data, folded_intens, unfolded_spec, folded_spec, FP, v0, vmax, 
              folded_intens, 
              '.',
              color = 'steelblue', 
-             label = 'fld. raw data')
+             label = 'folded raw data')
     #best fit curve for folded data
     ax1.plot(x_fold, 
              folded_spec.best_fit, 
              '-', 
              color='darkorange', 
              label='best fit ' 
-                   + '('+r'$R^2 =$ ' + '{:.4}'.format(folded_spec.rsquared)+')')
+                   #+ '('+r'$R^2 =$ ' + '{:.4}'.format(folded_spec.rsquared)+')')
+                   #R² is wrongly calculated from lmfit in case of weights <> 1
+                   + '('+r'$R^2 =$ ' + '{:.4}'.format(r_squared)+')')
     #residuals for folded data
+    #residuals multiplied with mean stddev
     ax1.plot(x_fold, 
-             1 - folded_spec.residual + max(folded_intens)*0.01 + max(folded_intens), 
+             1 - folded_spec.residual * mean_stdev_fold_i + max(folded_intens)*0.01 +\
+                 max(folded_intens), 
              '.', 
              color = 'lightgrey', 
              label = 'residuals')
@@ -304,7 +329,7 @@ def plot(ws5_raw_data, folded_intens, unfolded_spec, folded_spec, FP, v0, vmax, 
                  textcoords = "offset points",
                  xytext = (5,1), 
                  rotation = 90)
-                 
+            
     #label the centers of the Lorentz functions (used for calculation of v0)
     for index,center in enumerate(centerlist_v0):
         heightkey = 's'+ str(index) + '_height'
@@ -346,7 +371,8 @@ def plot(ws5_raw_data, folded_intens, unfolded_spec, folded_spec, FP, v0, vmax, 
                 fontsize = 8)
                 
     #secondary x-axis (secax) with velocity on top of ax1
-    def chan_2_vel(x_fold, vmax = vmax.nominal_value, v0 = v0.nominal_value, N_chan = len(ws5_raw_data)):
+    def chan_2_vel(x_fold, vmax = vmax.nominal_value, v0 = v0.nominal_value, \
+                   N_chan = len(ws5_raw_data)):
         return vmax - (vmax + vmax)/(N_chan/2-1)*(x_fold+ (N_chan/2-1)/2 - v0)
     
     start, end = ax1.get_xlim()
@@ -355,7 +381,7 @@ def plot(ws5_raw_data, folded_intens, unfolded_spec, folded_spec, FP, v0, vmax, 
     secax.set_xlabel('velocity $\mathrm{/mm \cdot s^{-1}}$')
     secax.tick_params(axis='x',direction='in')
     #end secondary x-axis (secax) with velocity on top of ax1           
-    
+   
     #arrange the plot window and show the plot
     mng = plt.get_current_fig_manager()
     mng.resize(1024,768)
@@ -403,26 +429,38 @@ unfolded_spec = do_the_fit(ws5_raw_data)
 #calculate FP (folding point)
 FP, centerlist_FP = calc_FP_v0(unfolded_spec)
 #fold spectrum
-folded_intens = fold_spec(ws5_raw_data, FP)
+folded_intens, mean_stdev_fold_i = fold_spec(ws5_raw_data, FP)
 #fit folded spectrum
-folded_spec = do_the_fit(folded_intens)
+folded_spec = do_the_fit(folded_intens, mean_stdev_fold_i)
 #calculate v0 (channel where velocity is zero)
 v0, centerlist_v0 = calc_FP_v0(folded_spec)
 #calc vmax (maximum velocity) and f (velocity per channel)
 vmax, f = calc_vmax(folded_spec, ws5_raw_data)
 
 #print results, filename and modification date of the .ws5 file
-print('-------------------------------------')
+print('======================================')
 print('Results for', filename, ':')
 print('File modified on', mod_date)
-print('-------------------------------------')
+print('--------------------------------------')
 print('FP (channel) =', u'{:.4fP}'.format(FP))
 print('v₀ (channel) =', u'{:.4fP}'.format(v0))
-print('vmax /mm·s⁻¹ = ', u'{:.4fP}'.format(vmax))
+print('vmax /mm·s⁻¹ = ', u'{: .4fP}'.format(vmax))
 print('f /mm·s⁻¹/c  =  ', u'{:.4fP}'.format(f))
-print('-------------------------------------')
+#print statistics from folded spectra
+print('======================================')
+print('Statistics (folded data with weights):')
+print('--------------------------------------')
+print('data points : ', '{}'.format(folded_spec.ndata))
+print('variables   : ', '{}'.format(folded_spec.nvarys))
+print('χ²          : ', '{:.2f}'.format(folded_spec.chisqr))
+print('red. χ²     : ', '{:.2f}'.format(folded_spec.redchi))
+ #R² is wrongly calculated from lmfit in case of weights <> 1
+r_squared = 1 - (folded_spec.residual * mean_stdev_fold_i).var() / \
+            np.var(folded_spec.data)
+print('R²          : ', '{:.4f}'.format(r_squared))
+print('======================================')
 
 if args.show:
     #plot on request
     plot(ws5_raw_data, folded_intens, unfolded_spec, folded_spec, FP, v0, vmax, f, 
-    filename, centerlist_FP, centerlist_v0, mod_date)
+    filename, centerlist_FP, centerlist_v0, mod_date, mean_stdev_fold_i )

@@ -25,7 +25,7 @@ attention to the start channel number and the folding direction.
 Terminal output:
 ```
 ======================================
-Results for 57Fe_calib_raw_data.ws5 :     ⇦ name of the file that contains ⁵⁷Fe-MB-spectrum 
+Results for 57Fe_calib_raw_data.ws5 :     ⇦ name of the file that contains the ⁵⁷Fe-MB-spectrum 
 File modified on 24.08.2023 13:33:53      ⇦ modification date
 --------------------------------------
 FP (channel) = 256.7889±0.0588            ⇦ folding point

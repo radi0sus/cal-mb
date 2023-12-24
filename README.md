@@ -69,7 +69,7 @@ To keep the figure, you have to click the floppy symbol (similar to 💾) in the
 - `FP` is the mean of the centers of the individual Lorentz functions (4, 8 or 12) of the raw spectrum.
 - `v0` is the mean of the centers of the individual Lorentz functions (2, 4 or 6) of the folded spectrum.
 - `f` is the mean of `f` calculated with $\Delta E_Q$ from ⁵⁷Fe divided by the difference of the centers of 
-   the single Lorentz functions form the outermost to the innermost pair (see also comment in the script).
+   the single Lorentz functions from the outermost to the innermost pair (see also comment in the script).
 - `vmax` is  `f * 127.5` in case of 256 channels. 
 - In case of unfolded data, the error can be estimated from the differences in the intensities of the left-hand side and
   right-hand side sub-spectra. The weighting for χ² and red. χ² is 1 / (mean standard deviation).

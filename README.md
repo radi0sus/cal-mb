@@ -78,7 +78,7 @@ To keep the figure, you have to click the floppy symbol (similar to 💾) in the
   should close to 1 in case of a good fit.    
   Please note that the calibration parameters are mainly derived from channel or velocity data (x-values), while only errors
   from intensity data or counts (y-values) are taken into account for the weigths of χ² and red. χ². 
-- R-squared is calculated by 1 - variance(residual * mean standard deviation) / variance(intensities),
-  because R-squared is calculated wrongly by `lmfit` in case of weights.
+- R² is calculated by 1 - variance(residual * mean standard deviation) / variance(intensities or counts),
+  because R² is calculated wrongly by `lmfit` in case of weights.
 - All other values and errors are calculated with `lmfit`.
 - The script has not been tested with raw data from 1024 channel multi-channel analyzers.

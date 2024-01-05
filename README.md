@@ -82,3 +82,7 @@ To keep the figure, you have to click the floppy symbol (similar to 💾) in the
   because R² is calculated wrongly by `lmfit` in case of weights.
 - All other values and errors are calculated with `lmfit`.
 - The script has not been tested with raw data from 1024 channel multi-channel analyzers.
+
+## Example 
+
+<img src='examples\show-use.gif' alt='Show use' width=600 align='center'> 
